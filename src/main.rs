@@ -1,3 +1,4 @@
+
 use std::ops::Add;
 
 struct Table0;
@@ -59,11 +60,15 @@ impl<T: Add<Output = T> + Copy> Add for &Column<Vec<T>> {
 }
 
 fn main() {
-    let table = Table::new()
-        .column(vec![1, 2, 3].into())
-        .column(vec![2, 3, 4].into());
-    let sum = &table.0 + &table.1;
-    let table = table.column(sum);
-
-    println!("{:?}", table.2)
+    let table = {
+        struct Table<X, Y> {
+            x: Column<X>,
+            y: Column<Y>,
+        }
+        Table{
+            x: vec![1, 2, 3].into(),
+            y: vec![4, 5, 6].into(),
+        }
+    };
+    println!("{:?}", &table.x + &table.y)
 }
