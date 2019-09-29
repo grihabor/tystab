@@ -41,9 +41,9 @@ impl Table {
 #[derive(Debug, Eq, PartialEq)]
 pub struct Column<T>(T);
 
-impl<T> From<T> for Column<T> {
-    fn from(values: T) -> Self {
-        Column(values)
+impl<T> From<Vec<T>> for Column<Vec<T>> {
+    fn from(value: Vec<T>) -> Self {
+        Column(value)
     }
 }
 
@@ -67,11 +67,16 @@ mod tests {
 
     #[test]
     fn add_columns() {
-        let table = table! {
+        let df = table! {
             x: vec![1, 2, 3],
             y: vec![4, 5, 6],
         };
-        let result = &table.x + &table.y;
-        assert_eq!(Column::from(vec![5, 7, 9]), result)
+        let result = &df.x + &df.y;
+        let df = table! {
+            x: df.x,
+            y: df.y,
+            s: result,
+        };
+        assert_eq!(Column::from(vec![5, 7, 9]), df.s)
     }
 }
