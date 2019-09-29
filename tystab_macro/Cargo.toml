@@ -1,5 +1,5 @@
 [package]
-name = "tystab-macro"
+name = "tystab_macro"
 version = "0.1.0"
 authors = ["Borodin Gregory <grihabor@gmail.com>"]
 edition = "2018"

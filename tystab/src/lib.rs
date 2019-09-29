@@ -1,60 +1,7 @@
-extern crate proc_macro;
-
-use quote::quote;
-use proc_macro::TokenStream;
-use syn::{ Ident};
-
-#[macro_use]
-mod parse {
-
-    use syn::{parse_macro_input, Ident, Type, Token};
-    use syn::parse::{Parse, ParseStream, Result};
-    use syn::punctuated::Punctuated;
-
-    pub struct Column(pub syn::Ident, pub syn::Type);
-
-    pub struct Table(pub Vec<Column>);
-
-    impl Parse for Column {
-        fn parse(input: ParseStream) -> Result<Self> {
-            let name: Ident = input.parse()?;
-            input.parse::<Token![:]>()?;
-            let ty: Type = input.parse()?;
-            Ok(Column(name, ty))
-        }
-    }
-
-    impl Parse for Table {
-        fn parse(input: ParseStream) -> Result<Self> {
-            let columns = Punctuated::<Column, Token![,]>::parse_terminated(input)?;
-            Ok(Table(columns.into_iter().collect()))
-        }
-    }
-}
-
-#[proc_macro_attribute]
-pub fn table(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let parse::Table(columns) = syn::parse_macro_input!(item as parse::Table);
-    let idents: Vec<Ident> = columns
-        .iter()
-        .map(|parse::Column(ident, _)| ident.clone())
-        .collect();
-    let i = (0..columns.len()).map(syn::Index::from);
-    let struct_def = quote! {
-        struct Table<#( #idents[#i], )*>
-    };
-    let i = (0..columns.len()).map(syn::Index::from);
-    let columns_def = quote! {{
-        #( #idents[#i]: #idents[#i], )*
-    }};
-    let result = quote! {
-        #struct_def
-        #columns_def
-    };
-    result.into()
-}
+extern crate tystab_macro;
 
 use std::ops::Add;
+pub use tystab_macro::table;
 
 pub struct Table0;
 pub struct Table1<A>(Column<A>);
@@ -91,7 +38,7 @@ impl Table {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct Column<T>(T);
 
 impl<T> From<T> for Column<T> {
@@ -114,3 +61,17 @@ impl<T: Add<Output = T> + Copy> Add for &Column<Vec<T>> {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::{table, Column};
+
+    #[test]
+    fn add_columns() {
+        let table = table! {
+            x: vec![1, 2, 3],
+            y: vec![4, 5, 6],
+        };
+        let result = &table.x + &table.y;
+        assert_eq!(Column::from(vec![5, 7, 9]), result)
+    }
+}
