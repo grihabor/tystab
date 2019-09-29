@@ -8,4 +8,4 @@ crate-type = ["staticlib"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tystab_macro = {path = "../tystab_macro"}
+counted-array = "0.1.2"

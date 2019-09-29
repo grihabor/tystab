@@ -1,7 +1,6 @@
-extern crate tystab_macro;
+mod tystab_macro;
 
 use std::ops::Add;
-pub use tystab_macro::table;
 
 pub struct Table0;
 pub struct Table1<A>(Column<A>);
@@ -64,6 +63,8 @@ impl<T: Add<Output = T> + Copy> Add for &Column<Vec<T>> {
 #[cfg(test)]
 mod tests {
     use super::{table, Column};
+    extern crate counted_array;
+    use counted_array::counted_array;
 
     #[test]
     fn add_columns() {

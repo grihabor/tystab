@@ -10,19 +10,14 @@ macro_rules! table {
                     $field_name: $field_name,
                 )*
             }
+            // impl Table<$( $field_name ),*> {
+            //    counted_array!(const COLUMNS: [String; _   ] = [$( stringify!($field_name).into() ),*]);
+            //}
             Table {
                 $(
                     $field_name: Column::from($value),
                 )*
             }
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
     }
 }
