@@ -60,6 +60,20 @@ impl<T: Add<Output = T> + Copy> Add for &Column<Vec<T>> {
     }
 }
 
+fn add_columns() {
+    let df = table! {
+        x: vec![1, 2, 3],
+        y: vec![4, 5, 6],
+    };
+    let result = &df.x + &df.y;
+    let df = table! {
+        x: df.x,
+        y: df.y,
+        s: result,
+    };
+    assert_eq!(Column::from(vec![5, 7, 9]), df.s)
+}
+
 #[cfg(test)]
 mod tests {
     use super::{table, Column};
@@ -68,16 +82,6 @@ mod tests {
 
     #[test]
     fn add_columns() {
-        let df = table! {
-            x: vec![1, 2, 3],
-            y: vec![4, 5, 6],
-        };
-        let result = &df.x + &df.y;
-        let df = table! {
-            x: df.x,
-            y: df.y,
-            s: result,
-        };
-        assert_eq!(Column::from(vec![5, 7, 9]), df.s)
+        super::add_columns()
     }
 }
